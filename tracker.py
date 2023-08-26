@@ -1,14 +1,22 @@
+from typing import Protocol, Sequence
 import math
 
-class RandomVariableTracker:
-    def __init__(self, random_vars: dict):
+class RandomVariableTracker(Protocol):
+        
+    def clue_probability(self, clue: str, var_index: int) -> float:
+        ...
+        
+    def max_log_probability_guess(self, clues: tuple[str], var_indices=None) -> tuple[float, tuple[str]]:
+        ...
+
+class SimpleTracker:
+    def __init__(self, random_vars: Sequence[dict]):
         self.random_vars = random_vars
-        
-    def clue_probability(self, clue: str, var_index: int):
-        # this would need to be more refined for the general case
-        return self.random_vars[var_index][clue] # P(X_i = clue)
-        
-    def max_log_probability_guess(self, clues: tuple[str], var_indices=None):
+    
+    def clue_probability(self, clue: str, var_index: int) -> float:
+        return self.random_vars[var_index].get(clue, 0.0) # P(X_i = clue)
+
+    def max_log_probability_guess(self, clues: tuple[str], var_indices=None) -> tuple[float, tuple[str]]:
         if not clues:
             return 0.0, tuple()
         
