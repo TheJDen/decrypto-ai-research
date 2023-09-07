@@ -1,18 +1,6 @@
 from typing import Sequence
 import math
 
-class RandomVariableTracker:
-    def __init__(self, random_vars: Sequence[dict], clue_probability_func, best_guess_func=max_log_probability_guess):
-        self.random_vars = random_vars
-        self.clue_probability_func = clue_probability_func
-        self.best_guess_func = best_guess_func
-
-    def clue_probability(self, clue: str, var_index: int) -> float:
-        return self.clue_probability_func(self.random_vars, clue, var_index)
-    
-    def best_guess(self, clues: tuple[str]):
-        return self.best_guess_func(self.clue_probability_func, self.random_vars, clues)
-
 def max_log_probability_guess(clue_probability_func, random_vars: Sequence[dict], clues: tuple[str], var_indices=None) -> [float, tuple[int]]:
     # smells like dp, could see if caching helps 
     def max_log_prob(clues, var_indices):
@@ -46,3 +34,14 @@ def max_log_probability_guess(clue_probability_func, random_vars: Sequence[dict]
 def simple_clue_probability(random_vars: Sequence[dict], clue: str, var_index: int):
     return random_vars[var_index].get(clue, 0.0) # P(X_i = clue)
 
+class RandomVariableTracker:
+    def __init__(self, random_vars: Sequence[dict], clue_probability_func, best_guess_func=max_log_probability_guess):
+        self.random_vars = random_vars
+        self.clue_probability_func = clue_probability_func
+        self.best_guess_func = best_guess_func
+
+    def clue_probability(self, clue: str, var_index: int) -> float:
+        return self.clue_probability_func(self.random_vars, clue, var_index)
+    
+    def best_guess(self, clues: tuple[str]):
+        return self.best_guess_func(self.clue_probability_func, self.random_vars, clues)
