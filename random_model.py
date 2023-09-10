@@ -1,27 +1,28 @@
 import math
+from dataclasses import dataclass
 from functools import partial, reduce
 from typing import Sequence
 
-# abstract/encapsulate RadnomVariable so don't have to think about log logic as much
+# wrap RandomVariable so log probabilities and type specs are more explicit
+
+@dataclass
+class RandomVariable:
+    log_probabilities: dict
 
 def softmax_combine(log_x, log_y):
     return log_x + math.log1p(math.exp(log_y - log_x))
 
-class RandomVariable:
-    def __init__(self, log_probabilities):
-        self.log_probabilities = log_probabilities
-
-    def log_expectation(self, key_to_log_val_func): # inject function, this is like log(E[f(X)])
-        if not self.log_probabilities:
-            return -math.inf
+def log_expectation(key_to_log_val_func, random_var: RandomVariable): # inject function, this is like log(E[f(X)])
+    if not random_var.log_probabilities:
+        return -math.inf
+    return reduce(softmax_combine,
+                    (log2_prob + key_to_log_val_func(key) for key, log2_prob in random_var.log_probabilities.items())
+                    )
         
-        return reduce(softmax_combine,
-                      (log2_prob + key_to_log_val_func(key) for key, log2_prob in self.log_probabilities.items())
-                      )
 
-     
 def max_expected_log_probability_guess(clue_and_keyword_to_log_prob_func, random_vars: Sequence[RandomVariable], clues: tuple[str]) -> [float, tuple[int]]:
-    keyword_to_log_prob_given_clue = [partial(clue_and_keyword_to_log_prob_func, clue) for clue in clues]
+    keyword_to_log_prob_given_clue_funcs = (partial(clue_and_keyword_to_log_prob_func, clue) for clue in clues)
+    log_expected_probability_given_clue_funcs = [partial(log_expectation, keyword_to_log_prob_given_clue_func) for keyword_to_log_prob_given_clue_func in keyword_to_log_prob_given_clue_funcs]
 
     # smells like dp, could see if caching helps if this ends up being bottleneck
     def max_expected_log_prob(var_indices=tuple(range(len(random_vars))), clue_indices=tuple(range(len(clues)))):
@@ -39,7 +40,7 @@ def max_expected_log_probability_guess(clue_and_keyword_to_log_prob_func, random
             remaining_var_indices = var_indices[:i] + var_indices[i + 1:]
             
             max_subproblem_expected_log_probability, guess = max_expected_log_prob(remaining_var_indices, remaining_clue_indices)
-            expected_log_probability = max_subproblem_expected_log_probability + random_vars[var_index].log_expectation(keyword_to_log_prob_given_clue[clue_index])
+            expected_log_probability = max_subproblem_expected_log_probability + log_expected_probability_given_clue_funcs[clue_index](random_vars[var_index])
             
             # update max log probability and corresponding code guess
             if expected_log_probability > max_expected_log_probability:
@@ -49,7 +50,3 @@ def max_expected_log_probability_guess(clue_and_keyword_to_log_prob_func, random
         return max_expected_log_probability, best_guess
     
     return max_expected_log_prob()
-
-# naive log-probability strategy (too specific, but works to show concept)
-def simple_log_prob_clue_and_keyword(clue, keyword):
-    return (0.0 if clue == keyword else -math.inf)
