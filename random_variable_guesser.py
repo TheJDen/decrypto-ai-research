@@ -28,27 +28,21 @@ class Guess:
     
 
 def max_log_expected_probability_guess(clue_and_keyword_to_log_prob_func, random_vars: Sequence[RandomVariable], clues: tuple[str]) -> Guess:
-    keyword_to_log_prob_given_clue_funcs = (partial(clue_and_keyword_to_log_prob_func, clue) for clue in clues)
-    log_expected_probability_given_clue_funcs = [partial(log_expectation, keyword_to_log_prob_given_clue_func) for keyword_to_log_prob_given_clue_func in keyword_to_log_prob_given_clue_funcs]
 
-    # smells like dp, could see if caching helps if this ends up being bottleneck
-    def max_log_expected_prob_guess(var_indices=tuple(range(len(random_vars))), clue_index = 0) -> Guess:
-        if clue_index == len(clues):
-            return Guess() # probability 1, empty code
-                        
-        best_guess = Guess(-math.inf) # start at probability 0, is like starting max at -inf
+    best_guess = [Guess(-math.inf)] * (len(clues) + 1)
 
-        # try each available random variable and see which yields best match probability
-        for i, var_index in enumerate(var_indices):
-            remaining_var_indices = var_indices[:i] + var_indices[i + 1:]
-            
-            subproblem_best_guess = max_log_expected_prob_guess(remaining_var_indices, clue_index + 1)
-            log_expected_probability = subproblem_best_guess.log_expected_probability + log_expected_probability_given_clue_funcs[clue_index](random_vars[var_index])
-            
-            # update max log probability and corresponding code guess
-            if log_expected_probability > best_guess.log_expected_probability:
-                best_guess = Guess(log_expected_probability, (var_index,) + subproblem_best_guess.code)
-                
-        return best_guess
-    
-    return max_log_expected_prob_guess()
+    # when there are no clues, return an empty Guess with probability 1
+    best_guess[0] = Guess()
+
+    for i, clue in enumerate(clues):
+        # curry clue into clue-and-keyword log probability strategy
+        keyword_to_log_prob_given_clue_func = partial(clue_and_keyword_to_log_prob_func, clue)
+        log_expected_probability_given_clue_func = partial(log_expectation, keyword_to_log_prob_given_clue_func)
+
+        for var_index, random_var in enumerate(random_vars):
+            log_expected_probability = best_guess[i].log_expected_probability + log_expected_probability_given_clue_func(random_var)
+            # update best guess up to this clue
+            if log_expected_probability > best_guess[i + 1].log_expected_probability:
+                best_guess[i + 1] = Guess(log_expected_probability, best_guess[i].code + (var_index,))
+
+    return best_guess[len(clues)]
