@@ -28,29 +28,37 @@ class Guess:
     
 
 def max_log_expected_probability_guess(clue_and_keyword_to_log_prob_func, random_vars: Sequence[RandomVariable], clues: tuple[str]) -> Guess:
-    # best_guess[mask][i] = max log expectation guess for random_vars specified by mask and clues[:i]
-    best_guess = [[Guess()] * (len(clues) + 1) for _ in range(1 << len(random_vars))]
     
-    for clue_index, clue in enumerate(clues):
+    num_random_var_subsets = 1 << len(random_vars)
+    # best_guess[bitmask] = max log expectation guess for random_vars specified by bitmask 
+    best_guess = [Guess()] * num_random_var_subsets # when no clues have been considered, the best guess is an empty code with probability 1
+    
+    # update best_guess with each clue
+    for clue in clues:
         # curry the clue to make a first argument for log_expectation
         keyword_to_log_prob_given_clue_func = partial(clue_and_keyword_to_log_prob_func, clue)
 
+        best_guess_with_clue = [Guess(-math.inf)] * num_random_var_subsets
+        
         # enumerate each nonempty subset of random variables
-        for var_indices in range(1, 1 << len(random_vars)):
+        for vars_bitmask in range(1, num_random_var_subsets):
             
             # compute the clue heuristic for each available random variable
             guesses = []
             for var_index, random_var in enumerate(random_vars):
-                if var_indices & (1 << var_index) == 0:
+                if vars_bitmask & (1 << var_index) == 0:
                     continue
-                remaining_var_indices = var_indices - (1 << var_index)
-                subproblem_best_guess = best_guess[remaining_var_indices][clue_index]
+
+                remaining_var_indices = vars_bitmask - (1 << var_index)
+                subproblem_best_guess = best_guess[remaining_var_indices]
                 log_expected_probability = subproblem_best_guess.log_expected_probability + log_expectation(keyword_to_log_prob_given_clue_func, random_var)
                 guess = Guess(log_expected_probability, subproblem_best_guess.code + (var_index,))
                 guesses.append(guess)
             
-            # choose the random variable with the best clue heuristic
-            best_guess[var_indices][clue_index + 1] = max(guesses, key = lambda guess: guess.log_expected_probability)
+            # choose the guess with the best clue heuristic
+            best_guess_with_clue[vars_bitmask] = max(guesses, key = lambda guess: guess.log_expected_probability)
+        
+        best_guess = best_guess_with_clue
 
-    all_random_vars = (1 << len(random_vars)) - 1
-    return best_guess[all_random_vars][len(clues)]
+    all_random_vars = num_random_var_subsets - 1
+    return best_guess[all_random_vars]
