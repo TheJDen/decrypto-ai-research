@@ -4,9 +4,14 @@ import json
 import numpy as np
 import os
 import random
+from itertools import permutations
 
-MEANING_DATASET_PATH = "meaning.json"
-TRIGGERWORD_DATASET_PATH = "trigger_word.json"
+MEANING_JSON_PATH = "meaning.json"
+TRIGGERWORD_JSON_PATH = "trigger_word.json"
+
+MEANING_CSV_PATH = "meaning_clues.csv"
+TRIGGERWORD_CSV_PATH = "triggerword_clues.csv"
+
 
 def datamuse_url(endpoint: str, words: list[str]): # can add stuff for prefix/suffix support later
     query_str = '+'.join(words)
@@ -72,3 +77,5 @@ def clueword_from_dataset(datamuse_dataset, code_word, seed=400):
 def clue_from_codewords(datamuse_dataset, codewords):
     return tuple(clueword_from_dataset(datamuse_dataset, word) for word in codewords)
 
+def all_possible_codes(keyword_card_length=4, clue_length=3):
+    return list(permutations(range(keyword_card_length), clue_length))
