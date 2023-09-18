@@ -21,5 +21,5 @@ Demonstrate original approach to interpretable Decrypto Guessing agent
 Use word2vec embeddings to create heuristics that make our unsupervised guesser prototype competent
 
 # word2vec supervised guessing
-Explore more traditional approach to Guesser using neural nets. May lead to proof that game-ification may inspire attention-based/Transformer architecture.
+Explore more traditional approach to Guesser using neural nets. May lead to proof that game-ification may inspire attention-based architecture.
 
