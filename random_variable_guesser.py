@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from functools import partial, reduce
 from typing import Sequence
 
+__author__ = "Jaden Rodriguez"
+
 # wrap RandomVariable so log probabilities and type specs are more explicit
 
 @dataclass

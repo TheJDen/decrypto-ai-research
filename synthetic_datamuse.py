@@ -6,6 +6,8 @@ import os
 import random
 from itertools import permutations
 
+__author__ = "Jaden Rodriguez"
+
 MEANING_JSON_PATH = "meaning.json"
 TRIGGERWORD_JSON_PATH = "trigger_word.json"
 

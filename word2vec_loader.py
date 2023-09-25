@@ -3,6 +3,8 @@ import gensim
 import gensim.downloader
 import gensim.models
 
+__author__ = "Jaden Rodriguez"
+
 GOOGLE_NEWS_PATH_NAME = "word2vec-google-news-300_c"
 
 def load_word2vec_keyedvectors(path_str, limit=200_000):
