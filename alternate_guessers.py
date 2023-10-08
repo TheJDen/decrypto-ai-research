@@ -27,9 +27,32 @@ def log_expectation(key_to_log_val_func, random_var: RandomVariable): # inject f
 class Guess:
     log_expected_probability: float = 0.0
     code: tuple[int] = tuple()
-    
 
-def max_log_expected_probability_guess(clue_and_keyword_to_log_prob_func, random_vars: Sequence[RandomVariable], clues: tuple[str]) -> Guess:
+def recursive_max_log_expected_probability_guess(clue_and_keyword_to_log_prob_func, random_vars: Sequence[RandomVariable], clues: tuple[str]) -> Guess:
+    keyword_to_log_prob_given_clue_funcs = (partial(clue_and_keyword_to_log_prob_func, clue) for clue in clues)
+    log_expected_probability_given_clue_funcs = [partial(log_expectation, keyword_to_log_prob_given_clue_func) for keyword_to_log_prob_given_clue_func in keyword_to_log_prob_given_clue_funcs]
+
+    # smells like dp, could see if caching helps if this ends up being bottleneck
+    def max_log_expected_prob_guess(var_indices=tuple(range(len(random_vars))), clue_index = 0) -> Guess:
+        if clue_index == len(clues):
+            return Guess() # probability 1, empty code
+                        
+        guesses = []
+
+        # try each available random variable and see which yields best match probability
+        for i, var_index in enumerate(var_indices):
+            remaining_var_indices = var_indices[:i] + var_indices[i + 1:]
+
+            subproblem_best_guess = max_log_expected_prob_guess(remaining_var_indices, clue_index + 1)
+            log_expected_probability = subproblem_best_guess.log_expected_probability + log_expected_probability_given_clue_funcs[clue_index](random_vars[var_index])
+            guess = Guess(log_expected_probability, (var_index,) + subproblem_best_guess.code)
+            guesses.append(guess)
+                
+        return max(guesses, key=lambda guess: guess.log_expected_probability)
+    
+    return max_log_expected_prob_guess()
+
+def iterative_max_log_expected_probability_guess(clue_and_keyword_to_log_prob_func, random_vars: Sequence[RandomVariable], clues: tuple[str]) -> Guess:
     
     num_random_var_subsets = 1 << len(random_vars)
     # best_guess[bitmask] = max log expectation guess for random_vars specified by bitmask 
@@ -64,3 +87,7 @@ def max_log_expected_probability_guess(clue_and_keyword_to_log_prob_func, random
 
     all_random_vars = num_random_var_subsets - 1
     return best_guess[all_random_vars]
+
+# naive log-probability strategy (too specific, but works to show concept)
+def simple_log_prob_clue_and_keyword(clue, keyword):
+    return (0.0 if clue == keyword else -math.inf)
