@@ -1,5 +1,6 @@
 import numpy as np
 import numpy_guesser as npg
+from functools import partial
 # shape-preserving normalization
 
 def normalized(log_probabilities: np.array) -> np.array:
