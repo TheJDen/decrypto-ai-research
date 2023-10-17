@@ -1,7 +1,9 @@
-from pathlib import Path
+import pathlib
 
-data = Path("data")
-models = Path("models")
+parent = pathlib.Path(__file__).resolve().parent.parent.parent
+
+data = parent / "data"
+models = parent / "models"
 
 GOOGLE_NEWS_PATH_NAME = models / "word2vec-google-news-300_c"
 
