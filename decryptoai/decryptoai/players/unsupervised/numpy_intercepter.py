@@ -33,8 +33,8 @@ def intercepter_random_variables(word_index, initial_distribution_func=equal_ini
 def updated_random_vars(clue_and_keyword_to_log_probability_func, random_vars: list[npg.NumpyRandomVariable], clue_indices: np.ndarray, correct_code: np.ndarray, probability_reshape=lambda x: x):
     var_log_probabilities = np.array([random_var.log_probabilities for random_var in random_vars])
     var_keyword_indices = np.array([random_var.keyword_indices for random_var in random_vars])
-    keyword_to_log_prob_vectorized = partial(clue_and_keyword_to_log_probability_func, clue_indices)
-    log_association_probabilities = keyword_to_log_prob_vectorized(var_keyword_indices[correct_code])
-    reshaped_log_associatipon_probabilities = probability_reshape(log_association_probabilities)
-    var_log_probabilities[correct_code] += reshaped_log_associatipon_probabilities
+    keyword_to_log_prob = partial(clue_and_keyword_to_log_probability_func, clue_indices)
+    log_association_probabilities = keyword_to_log_prob(var_keyword_indices[correct_code])
+    reshaped_log_association_probabilities = probability_reshape(log_association_probabilities)
+    var_log_probabilities[correct_code] += reshaped_log_association_probabilities
     return [npg.NumpyRandomVariable(normalized(log_probabilities), keyword_indices) for log_probabilities, keyword_indices in zip(var_log_probabilities, var_keyword_indices)]
