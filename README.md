@@ -7,19 +7,25 @@ pip install -U certifi
 
 /Applications/Python 3.X/Install Certificates.command
 ```
+## decryptoai
 
-# word2vec integration
+decryptoai is a package that keeps track of my algorithm implementations. It is not deployed to PyPi because the algorithms are still experimental. It may be installed by cloning the repo and pip installing decryptoai in the same directory.
+
+# notebooks/word2vec/word2vec_integration
 First look at how word2vec embeddings behave in the Decrypto context
 
-# synthetic datamuse
+# notebooks/datamuse
 Use the [Datamuse API](https://www.datamuse.com/api/) and asyncio to generate synthetic datasets
 
-# unsupervised guesser proof-of-concept
-Demonstrate original approach to interpretable Decrypto Guessing agent
+# notebooks/proof-of-concept
+Demonstrate original approach to interpretable Decrypto Guessing and Intercepting agents
 
-# word2vec unsupervised guessing
-Use word2vec embeddings to create heuristics that make our unsupervised guesser prototype competent
+# notebooks/word2vec
+Use word2vec embeddings to create heuristics that make our POC prototypes competent
 
-# word2vec supervised guessing
-Explore more traditional approach to Guesser using neural nets. May lead to proof that game-ification may inspire attention-based architecture.
+# notebooks/word2vec/word2vec_supervised_guesser.ipynb
+Explore more traditional approach to Guesser using neural nets. Has demoonstrated that game-ification may inspire attention-based architecture!
+
+# notebooks/alternative_guessers.ipynb
+Other guessing algorithms I considered that used COmpetitive Programming techniques like Recursive Backtracking, Dynamic Programming, and enumerating bitsets
 
