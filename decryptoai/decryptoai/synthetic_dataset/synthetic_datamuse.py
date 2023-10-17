@@ -2,17 +2,10 @@ import asyncio
 import aiohttp
 import json
 import numpy as np
-import os
 import random
 from itertools import permutations
 
 __author__ = "Jaden Rodriguez"
-
-MEANING_JSON_PATH = "meaning.json"
-TRIGGERWORD_JSON_PATH = "trigger_word.json"
-
-MEANING_CSV_PATH = "meaning_clues.csv"
-TRIGGERWORD_CSV_PATH = "triggerword_clues.csv"
 
 
 def datamuse_url(endpoint: str, words: list[str]): # can add stuff for prefix/suffix support later
@@ -38,21 +31,23 @@ def create_dataset_dict(responses):
     meaning_dataset = {}
     for word, response in responses:
         response_object = json.loads(response)
-        meaning_dataset[word] = response_object
+        if response_object:
+            meaning_dataset[word] = response_object
     return meaning_dataset
 
-async def load_dataset_from_path(path_str, endpoint: str, words):
-    if not os.path.exists(path_str):
-
+async def load_dataset_from_path(path, endpoint: str, words):
+    if not path.exists():
+        if not path.parent.exists():
+            path.parent.mkdir()
         urls = [datamuse_url(endpoint, [word]) for word in words]
         responses = await fetch_text_responses(urls, words)
 
         dataset = create_dataset_dict(responses)
 
-        with open(path_str, 'w') as f:
+        with open(str(path), 'w') as f:
             json.dump(dataset, f)
     else:
-        with open(path_str) as f:
+        with open(str(path)) as f:
             dataset = json.load(f)
     return dataset
 
@@ -66,7 +61,7 @@ def filter_illegal_cluewords(legal_clue_func, datamuse_dataset):
 def clueword_from_dataset(datamuse_dataset, code_word, seed=400):
     candidate_words = []
     scores = []
-    if not datamuse_dataset[code_word]:
+    if code_word not in datamuse_dataset:
         return "garbage"
     for word_info in datamuse_dataset[code_word]:
         candidate_words.append(word_info["word"])

@@ -1,6 +1,6 @@
 import pathlib
 
-parent = pathlib.Path(__file__).resolve().parent.parent.parent
+parent = pathlib.Path(__file__).resolve().parent.parent.parent  # config.py -> decryptoai -> decryptoai -> research dir
 
 data = parent / "data"
 models = parent / "models"
