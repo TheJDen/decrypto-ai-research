@@ -29,9 +29,9 @@ Use word2vec embeddings to create heuristics that make our POC prototypes compet
 
 
 ## notebooks/word2vec/word2vec_supervised_guesser.ipynb
-Explore more traditional approach to Guesser using neural nets. Has demoonstrated that game-ification may inspire attention-based architecture!
+Explore more traditional approach to Guesser using neural nets. Has demonstrated that game-ification may inspire attention-based architecture!
 
 
 ## notebooks/alternative_guessers.ipynb
-Other guessing algorithms I considered that used COmpetitive Programming techniques like Recursive Backtracking, Dynamic Programming, and enumerating bitsets
+Other guessing algorithms I considered that used Competitive Programming techniques like Recursive Backtracking, Dynamic Programming, and enumerating bitsets
 
