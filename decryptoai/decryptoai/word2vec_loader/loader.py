@@ -24,14 +24,18 @@ def official_keyword_to_word(keyword: str):
         return typos[keyword]
     proper_nouns = [
         "AFRICA",
+        "AUSTRALIA",
+        "CALIFORNIA",
         "CENTAUR",
         "CYCLOPS",
         "EGYPT",
         "FRANCE",
         "GERMANY",
+        "OLYMPICS",
         "PEGASUS",
         "QUEBEC",
-        "RUSSIA"
+        "RUSSIA",
+        "TEXAS"
     ]
     if keyword in proper_nouns:
         return keyword.capitalize()
