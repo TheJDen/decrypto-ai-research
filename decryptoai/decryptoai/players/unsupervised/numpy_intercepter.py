@@ -1,5 +1,5 @@
 import numpy as np
-import numpy_guesser as npg
+import decryptoai.players.unsupervised.numpy_guesser as npg
 from functools import partial
 # shape-preserving normalization
 
