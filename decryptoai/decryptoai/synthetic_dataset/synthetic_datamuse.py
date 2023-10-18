@@ -58,7 +58,7 @@ def filter_illegal_cluewords(legal_clue_func, datamuse_dataset):
         filtered_dataset[keyword] = legal_info
     return filtered_dataset        
 
-def clueword_from_dataset(datamuse_dataset, code_word, seed=400):
+def clueword_from_dataset(datamuse_dataset, code_word, seed=None):
     candidate_words = []
     scores = []
     if code_word not in datamuse_dataset:
