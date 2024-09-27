@@ -23,16 +23,17 @@ def np_clues(clues, word_index):
 def num_indices_for_cumulative_probability(log_probabilties: np.ndarray, keyword_indices_by_decreasing_probability: np.ndarray, cumulative_probability=1.0):
     # polling from a max heap until we reach cumulative_probability would be better for this theoretically
     # but lost NumPy speed may dominate
-    log_probabilties_by_decreasing_probability = log_probabilties[np.expand_dims(np.arange(len(log_probabilties)), axis=-1), keyword_indices_by_decreasing_probability]
-    earliest_index = np.argmax(log_probabilties_by_decreasing_probability.cumsum(axis=-1) >= np.log(cumulative_probability), axis=-1)
+    probabilties_by_decreasing_probability = np.exp(log_probabilties[np.expand_dims(np.arange(len(log_probabilties)), axis=-1), keyword_indices_by_decreasing_probability])
+    earliest_index = np.argmax(probabilties_by_decreasing_probability.cumsum(axis=-1) >= cumulative_probability, axis=-1)
     return earliest_index + 1
+
 
 def random_vars_at_least_cumulative_probability(random_variables: list[NumpyRandomVariable], cumulative_probability=1.0):
     var_log_probabilities = np.array([random_variable.log_probabilities for random_variable in random_variables])
     keyword_indices_by_decreasing_probability = (-var_log_probabilities).argsort()
     num_indices = num_indices_for_cumulative_probability(var_log_probabilities, keyword_indices_by_decreasing_probability, cumulative_probability)
     reduced_keyword_indices = keyword_indices_by_decreasing_probability[:, slice(np.max(num_indices))]
-    reduced_var_log_probabilities = var_log_probabilities[reduced_keyword_indices]
+    reduced_var_log_probabilities = var_log_probabilities[np.expand_dims(np.arange(len(var_log_probabilities)), axis=-1), reduced_keyword_indices]
     return [NumpyRandomVariable(log_probabilities, keyword_indices) for log_probabilities, keyword_indices in zip(reduced_var_log_probabilities, reduced_keyword_indices)]
 
 # refactored guessing functions
